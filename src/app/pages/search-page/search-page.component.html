@@ -1,0 +1,150 @@
+<div class="modal is-active" *ngIf="modalData">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          {{modalData.title}}
+        </p>
+      </header>
+      <div class="card-content">
+        <div class="columns">
+          <div class="column is-one-third is-hidden-mobile">
+            <figure class="image">
+              <img [src]="'https://image.tmdb.org/t/p/original' + modalData.poster_path">
+            </figure>
+          </div>
+          <div class="column is-two-third">
+            <div class="content" style="flex-grow: 1;">
+              <h4>Overview</h4>
+              <p>
+                {{modalData.overview}}
+              </p>
+              <h3 *ngIf="modalData.vote_average">
+                <span class="icon">
+                  <i class="fa fa-star" style="color: gold"></i>
+                </span>
+                {{modalData.vote_average}}
+                <span class="subtitle is-6">/ 10</span>
+              </h3>
+              <div class="columns">
+                <div class="column is-6 is-offset-6">
+                  <a class="button is-radiusless is-info full-width" (click)="closeModalAndDownload(modalData)" *ngIf="!modalData.exists">
+                    Download
+                  </a>
+                  <a class="button is-radiusless is-primary full-width" *ngIf="modalData.exists">
+                    In Library
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="modal-close is-large" (click)="closeModal()" aria-label="close"></button>
+</div>
+
+<section class="hero is-fullheight">
+  <div class="hero-body">
+    <div id="info" class="container has-text-centered">
+      <div class="columns is-vcentered is-centered">
+        <div class="column is-two-thirds" id="search">
+          <h1 class="title is-1">{{config.page.title}}</h1>
+          <p>{{config.page.subtitle}}</p>
+          <br>
+          <div class="is-hidden-desktop is-hidden-widescreen is-hidden-fullhd is-hidden-tablet">
+            <div class="field">
+              <div class="control is-expanded">
+                <input class="input" type="text" placeholder="eg. Shrek" [(ngModel)]="searchQuery" (keyup.enter)="resetAndSearch()">
+              </div>
+            </div>
+            <div class="field">
+              <div class="control full-width">
+                <a class="button is-info" (click)="resetAndSearch()">
+                  Search
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="field has-addons is-hidden-mobile">
+            <div class="control is-expanded">
+              <input class="input is-large" type="text" placeholder="eg. Shrek" [(ngModel)]="searchQuery" (keyup.enter)="resetAndSearch()">
+            </div>
+            <div class="control">
+              <a class="button is-expanded is-large is-info" (click)="resetAndSearch()">
+                Search
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="searchResponse" class="container">
+        <div class="columns is-multiline">
+          <div class="column is-one-fifth" *ngFor="let movie of searchResponse.results">
+            <div class="card is-fullwidth">
+              <div *ngIf="movie.poster_path" class="card-image">
+                <figure class="image">
+                  <img [src]="'https://image.tmdb.org/t/p/original' + movie.poster_path">
+                </figure>
+              </div>
+              <div class="card-content">
+                {{movie.title}}
+              </div>
+              <footer class="card-footer">
+                <a class="card-footer-item" (click)="openModal(movie)">
+                  <span class="icon">
+                    <i class="fa fa-info"></i>
+                  </span>
+                </a>
+                <a class="card-footer-item" style="background: hsl(204, 86%, 53%)" (click)="downloadItem(movie); movie.exists = true" *ngIf="!movie.exists">
+                  <span class="icon">
+                    <i class="fa fa-cloud-download fa-inverse"></i>
+                  </span>
+                </a>
+                <a class="card-footer-item" style="background: hsl(171, 100%, 41%)" *ngIf="movie.exists">
+                  <span class="icon">
+                    <i class="fa fa-check fa-inverse"></i>
+                  </span>
+                </a>
+              </footer>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div *ngIf="searchResponse" class="container">
+        <div class="columns">
+          <div class="column is-half">
+            <a style="float:left" *ngIf="(currentPage - 1) > 0" class="pagination-previous" (click)="prevPage()">Previous</a>
+          </div>
+          <div class="column is-half">
+            <a style="float:right" *ngIf="searchResponse.total_results > (currentPage * 20)" class="pagination-next" (click)="nextPage()">Next page</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-foot" *ngIf="storageSpace && !searchResponse">
+    <div class="container">
+      <div class="columns is-multiline level is-centered">
+        <div class="column is-12 has-text-centered">
+          <p>
+            Available Storage Space: {{bToTB(storageSpace['freeSpace'])}}
+          </p>
+        </div>
+        <div class="column is-2 has-text-right level-item is-hidden-mobile">
+          {{bToTB(storageSpace['usedSpace'])}}
+        </div>
+        <div class="column is-half level-item is-hidden-mobile">
+          <progress class="progress is-info" [ngClass]="{'is-info': (storageSpace['usedSpace']/storageSpace['totalSpace']) < 0.75, 'is-warning': (storageSpace['usedSpace']/storageSpace['totalSpace']) <= 0.85 && (storageSpace['usedSpace']/storageSpace['totalSpace']) > 0.75, 'is-danger': (storageSpace['usedSpace']/storageSpace['totalSpace']) > 0.85}"
+            [value]="storageSpace['usedSpace']" [max]="storageSpace['totalSpace']"></progress>
+        </div>
+        <div class="column is-2 has-text-left level-item is-hidden-mobile">
+          {{bToTB(storageSpace['totalSpace'])}}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

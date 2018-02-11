@@ -1,0 +1,10 @@
+{
+  "/tvdb": {
+    "target": "https://api.thetvdb.com",
+    "secure": true,
+    "pathRewrite": {
+    "^/tvdb": ""
+  },
+    "changeOrigin": true
+  }
+}
