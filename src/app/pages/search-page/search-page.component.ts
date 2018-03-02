@@ -23,7 +23,7 @@ export class SearchPageComponent implements OnInit {
     private api: MovieDatabaseService,
     private spinnerService: Ng4LoadingSpinnerService,
     private radarr: RadarrService,
-    private config: ConfigService) {
+    public config: ConfigService) {
       this.spinnerService.show();
   }
 
