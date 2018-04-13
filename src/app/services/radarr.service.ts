@@ -1,12 +1,12 @@
 import { ConfigService } from './config.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SlugifyService } from './slugify.service';
+import { slugify } from '../functions/slugify';
 
 @Injectable()
 export class RadarrService {
   public movies: Array<Object>;
-  constructor(private http: HttpClient, private config: ConfigService, private slugifyService: SlugifyService) {}
+  constructor(private http: HttpClient, private config: ConfigService) {}
 
   /**
    * Gets all your movies from Radarr and sets the movies array to the response.
@@ -44,7 +44,7 @@ export class RadarrService {
         title: movie.original_title,
         qualityProfileId: 6,
         year: new Date(movie.release_date).getFullYear(),
-        titleSlug: this.slugifyService.slugify(movie.original_title),
+        titleSlug: slugify(movie.original_title),
         rootFolderPath: this.config.serviceSettings.radarr.rootPath,
         tmdbID: movie['id'],
         images: [
