@@ -1,5 +1,4 @@
 import { ConfigService } from './services/config.service';
-import { SlugifyService } from './services/slugify.service';
 
 import { SearchPageComponent } from './pages/search-page/search-page.component';
 import { BrowserModule } from '@angular/platform-browser';
@@ -36,7 +35,6 @@ const appRoutes: Routes = [
   providers: [
     MovieDatabaseService,
     RadarrService,
-    SlugifyService,
     ConfigService
   ],
   bootstrap: [AppComponent]
